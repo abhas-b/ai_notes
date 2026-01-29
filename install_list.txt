@@ -1,0 +1,1 @@
+uv add langchain langchain_openai black isort langchain_tavily python-dotenv
