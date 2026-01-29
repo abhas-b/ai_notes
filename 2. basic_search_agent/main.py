@@ -3,34 +3,29 @@ from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
-from tavily import TavilyClient
-# from langchain_tavily import TavilySearch
+from langchain_tavily import TavilySearch
+from typing import List
+from pydantic import BaseModel, Field
 import os
 
 load_dotenv(dotenv_path="../.env")
 
-tavily_key = os.environ['TAVILY_API_KEY']
-tavily = TavilyClient(api_key=tavily_key)
+class Source(BaseModel):
+    """Schema for the source used by the agent"""
 
-#custom impementation. Can easily be replaced with TavilySearch from Tavily team itself.
-@tool
-def search(query: str) -> str:
-    """
-    Tool that searches over the internet to respond to a user query seeking information.
+    url:str = Field(description="The URL of the source")
 
-    Args:
-        query: the query to search for
-    Returns:
-        the search result
-    """
+class AgentResponse(BaseModel):
+    """Schema for agent response"""
 
-    print(f"Searching for {query}")
-    return tavily.search(query=query)
+    answer:str = Field(description="The agent answer to the query")
+    sources:List[Source] = Field(default_factory=list, description="List of sources to generate the answer.")
+
+
 
 llm = ChatOpenAI(temperature=0, model='gpt-4o-mini')
-tools = [search]
-# tools = [TavilySearch()]
-agent = create_agent(model=llm, tools=tools)
+tools = [TavilySearch()]
+agent = create_agent(model=llm, tools=tools, response_format=AgentResponse)
 
 def main():
     print("Hello from 2-basic-search-agent!")
