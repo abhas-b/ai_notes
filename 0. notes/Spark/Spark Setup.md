@@ -1,0 +1,8 @@
+#spark [[Spark]]
+
+Parameters required:
+1. HADOOP_HOME
+2. PYSPARK_PYTHON
+3. PYTHONPATH
+4. SPARK_HOME
+5. JAVA_HOME
